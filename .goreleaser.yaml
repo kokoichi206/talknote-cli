@@ -1,0 +1,51 @@
+version: 2
+
+project_name: talknote-cli
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: tn
+    main: ./cmd/tn
+    binary: tn
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    ldflags:
+      - -s -w
+      - -X github.com/kokoichi206/talknote-cli/internal/version.Version={{ .Version }}
+      - -X github.com/kokoichi206/talknote-cli/internal/version.Commit={{ .Commit }}
+      - -X github.com/kokoichi206/talknote-cli/internal/version.Date={{ .Date }}
+
+archives:
+  - formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+
+checksum:
+  name_template: checksums.txt
+
+release:
+  prerelease: auto
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  use: github-native

@@ -1,0 +1,4 @@
+/tn
+/dist/
+*.test
+/.config/talknote-cli.json
